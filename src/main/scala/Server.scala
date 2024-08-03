@@ -21,7 +21,7 @@ case class Message(message: String)
   implicit val messageFormat: RootJsonFormat[Message] = jsonFormat1(Message.apply)
   val logger = LoggerFactory.getLogger("ChatServerLogger")
 
-  val route =
+  val routes =
     path("") {
       get {
         logger.info("GET /")
@@ -30,9 +30,17 @@ case class Message(message: String)
           Message.apply("Hello, World!"),
         )
       }
+    } ~
+    path("send-message") {
+      post {
+        entity(as[Message]) { message =>
+          logger.info(s"POST / - Received message: ${message.message}")
+          complete(StatusCodes.OK, Message.apply("Message received"))
+        }
+      }
     }
 
-  val bindingFuture = Http().newServerAt("localhost", 8080).bind(route)
+  val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
   logger.info(s"Server online at http://localhost:8080/")
   logger.debug("Press RETURN to stop...")
 
