@@ -4,10 +4,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.*
 
 import scala.concurrent.ExecutionContextExecutor
-import scala.io.StdIn
+import scala.io.{Source, StdIn}
 import spray.json.DefaultJsonProtocol.*
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import org.slf4j.LoggerFactory
 import spray.json.RootJsonFormat
 
@@ -25,10 +25,8 @@ case class Message(message: String)
     path("") {
       get {
         logger.info("GET /")
-        complete(
-          StatusCodes.OK,
-          Message.apply("Hello, World!"),
-        )
+        val fileContent = Source.fromResource("public/index.html").mkString
+        complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, fileContent))
       }
     } ~
     path("send-message") {

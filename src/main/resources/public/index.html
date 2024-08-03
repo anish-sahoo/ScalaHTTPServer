@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scala HTTP Server</title>
+</head>
+<body>
+<h1>Welcome to Scala HTTP Server</h1>
+<p>This is a basic HTML page served by the Scala HTTP server.</p>
+<p>Use this to try out post requests to this server</p>
+<input type="text" id="messageInput" placeholder="Enter your message">
+<button onclick="sendMessage()">Send Message</button>
+
+<p id="response"></p>
+
+<script>
+    async function sendMessage() {
+        const message = document.getElementById('messageInput').value;
+        const responseElement = document.getElementById('response');
+
+        try {
+            const response = await fetch('/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+                responseElement.textContent = `Response: ${JSON.stringify(responseData)}`;
+            } else {
+                responseElement.textContent = 'Error: Failed to send message';
+            }
+        } catch (error) {
+            responseElement.textContent = `Error: ${error.message}`;
+        }
+    }
+</script>
+</body>
+</html>
